@@ -1,0 +1,4 @@
+include LICENSE
+include README.md
+recursive-include login/static *
+recursive-include login/templates *
