@@ -79,11 +79,11 @@ class RegistrationView(generics.GenericAPIView):
         )
 
         html_message = render_to_string(
-            'cred/email-activation-inline.html',
+            'login/email-activation-inline.html',
             {'url': url, 'email': settings.DEFAULT_FROM_EMAIL}
         )
         text_message = render_to_string(
-            'cred/email-activation.txt',
+            'login/email-activation.txt',
             {'url': url, 'email': settings.DEFAULT_FROM_EMAIL}
         )
         logger.info('Sending activation email to user {}'.format(user.pk))
@@ -190,11 +190,11 @@ class ResetPasswordView(generics.GenericAPIView):
         )
         url = self.request.build_absolute_uri(path)
         html_message = render_to_string(
-            'cred/email-password-change-inline.html',
+            'login/email-password-change-inline.html',
             {'url': url, 'email': settings.DEFAULT_FROM_EMAIL}
         )
         text_message = render_to_string(
-            'cred/email-password-change.txt',
+            'login/email-password-change.txt',
             {'url': url, 'email': settings.DEFAULT_FROM_EMAIL}
         )
         logger.info('Reset link for {}: {}'.format(user, url))

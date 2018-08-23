@@ -97,7 +97,7 @@ class RegistrationTestCase(APITestCase):
         self.assertEqual(models.User.objects.get().email, 'test@example.com')
 
     @mock.patch.multiple(
-        'cred.authentication.GoogleOauth2TokenAuthentication',
+        'login.authentication.GoogleOauth2TokenAuthentication',
         validate_token=mock.DEFAULT,
         fetch_email=mock.DEFAULT
     )

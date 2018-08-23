@@ -4,20 +4,20 @@ from django.conf import settings
 from rest_framework.settings import APISettings
 
 
-USER_SETTINGS = getattr(settings, 'CRED', None)
+USER_SETTINGS = getattr(settings, 'LIBDRF_LOGIN', None)
 
 DEFAULTS = {
     'JWT_ENCODE_HANDLER':
-    'cred.utils.jwt_encode_handler',
+    'login.utils.jwt_encode_handler',
 
     'JWT_DECODE_HANDLER':
-    'cred.utils.jwt_decode_handler',
+    'login.utils.jwt_decode_handler',
 
     'JWT_PAYLOAD_HANDLER':
-    'cred.utils.jwt_payload_handler',
+    'login.utils.jwt_payload_handler',
 
     'JWT_RESPONSE_PAYLOAD_HANDLER':
-    'cred.utils.jwt_response_payload_handler',
+    'login.utils.jwt_response_payload_handler',
 
     'JWT_SECRET_KEY': settings.SECRET_KEY,
     'JWT_ALGORITHM': 'HS256',
@@ -42,4 +42,4 @@ IMPORT_STRINGS = (
     'JWT_RESPONSE_PAYLOAD_HANDLER',
 )
 
-api_settings = APISettings(USER_SETTINGS, DEFAULTS, IMPORT_STRINGS)
+login_settings = APISettings(USER_SETTINGS, DEFAULTS, IMPORT_STRINGS)

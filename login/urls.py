@@ -21,5 +21,5 @@ urlpatterns = [
     url(r'^validate/facebook$', views.FacebookTokenExhangeView.as_view(), name='validate_facebook_token'),
 
     # Rendered email templates
-    url(r'^email/activation$', TemplateView.as_view(template_name='cred/email-activation-inline.html')),
+    url(r'^email/activation$', TemplateView.as_view(template_name='login/email-activation-inline.html')),
 ]

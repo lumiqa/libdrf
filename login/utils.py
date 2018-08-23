@@ -1,6 +1,6 @@
 import jwt
 from rest_framework.exceptions import AuthenticationFailed
-from .settings import cred_settings
+from .settings import login_settings
 from datetime import datetime
 from calendar import timegm
 
@@ -15,13 +15,13 @@ def jwt_get_secret_key(payload=None):
 
     if user.password_reset:
         return '{}:{}:{}'.format(
-            cred_settings.JWT_SECRET_KEY,
+            login_settings.JWT_SECRET_KEY,
             user.pk,
             user.password_reset.timestamp()
         )
     else:
         return '{}:{}'.format(
-            cred_settings.JWT_SECRET_KEY,
+            login_settings.JWT_SECRET_KEY,
             user.pk
         )
 
@@ -29,12 +29,12 @@ def jwt_get_secret_key(payload=None):
 def jwt_payload_handler(user):
     payload = {
         'user_id': user.pk,
-        'exp': datetime.utcnow() + cred_settings.JWT_EXPIRATION_DELTA
+        'exp': datetime.utcnow() + login_settings.JWT_EXPIRATION_DELTA
     }
 
     # Include original issued at time for a brand new token,
     # to allow token refresh
-    if cred_settings.JWT_ALLOW_REFRESH:
+    if login_settings.JWT_ALLOW_REFRESH:
         payload['orig_iat'] = timegm(
             datetime.utcnow().utctimetuple()
         )
@@ -47,26 +47,26 @@ def jwt_encode_handler(payload):
     return jwt.encode(
         payload,
         key,
-        cred_settings.JWT_ALGORITHM
+        login_settings.JWT_ALGORITHM
     ).decode('utf-8')
 
 
 def jwt_decode_handler(token):
     options = {
-        'verify_exp': cred_settings.JWT_VERIFY_EXPIRATION,
+        'verify_exp': login_settings.JWT_VERIFY_EXPIRATION,
     }
     # get user from token, BEFORE verification, to get user secret key
     unverified_payload = jwt.decode(token, None, False)
     secret_key = jwt_get_secret_key(unverified_payload)
     return jwt.decode(
         token,
-        cred_settings.JWT_PUBLIC_KEY or secret_key,
-        cred_settings.JWT_VERIFY,
+        login_settings.JWT_PUBLIC_KEY or secret_key,
+        login_settings.JWT_VERIFY,
         options=options,
-        leeway=cred_settings.JWT_LEEWAY,
-        audience=cred_settings.JWT_AUDIENCE,
-        issuer=cred_settings.JWT_ISSUER,
-        algorithms=[cred_settings.JWT_ALGORITHM]
+        leeway=login_settings.JWT_LEEWAY,
+        audience=login_settings.JWT_AUDIENCE,
+        issuer=login_settings.JWT_ISSUER,
+        algorithms=[login_settings.JWT_ALGORITHM]
     )
 
 
