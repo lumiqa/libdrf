@@ -1,17 +1,16 @@
 import logging
 
 import requests
-from django.conf import settings
 from rest_framework import exceptions
 from rest_framework.authentication import BaseAuthentication
-from rest_framework_jwt.settings import api_settings
+from .settings import login_settings
 
 from . import models
 
 logger = logging.getLogger(__name__)
 
-jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+jwt_payload_handler = login_settings.JWT_PAYLOAD_HANDLER
+jwt_encode_handler = login_settings.JWT_ENCODE_HANDLER
 
 
 class BaseSocialTokenAuthentication(BaseAuthentication):
@@ -71,7 +70,7 @@ class GoogleOauth2TokenAuthentication(BaseSocialTokenAuthentication):
     """
     validation_url = 'https://www.googleapis.com/oauth2/v3/tokeninfo'
     user_url = 'https://www.googleapis.com/plus/v1/people/me'
-    client_ids = settings.GOOGLE_OAUTH2_CLIENT_IDS
+    client_ids = login_settings.SOCIAL_AUTH_GOOGLE_CLIENT_IDS
 
     def validate_token(self, token, request):
         # Validate token and make sure it's intended for this app
@@ -113,8 +112,8 @@ class FacebookTokenAuthentication(BaseSocialTokenAuthentication):
 
     validation_url = 'https://graph.facebook.com/debug_token'
     user_url = 'https://graph.facebook.com/me'
-    app_id = settings.FACEBOOK_APP_ID
-    app_secret = settings.FACEBOOK_APP_SECRET
+    app_id = login_settings.SOCIAL_AUTH_FACEBOOK_APP_ID
+    app_secret = login_settings.SOCIAL_AUTH_FACEBOOK_APP_SECRET
 
     def validate_token(self, token, request):
         # Validate token and make sure it's intended for this app

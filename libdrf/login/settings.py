@@ -8,16 +8,16 @@ USER_SETTINGS = getattr(settings, 'LIBDRF_LOGIN', None)
 
 DEFAULTS = {
     'JWT_ENCODE_HANDLER':
-    'login.utils.jwt_encode_handler',
+    'libdrf.login.utils.jwt_encode_handler',
 
     'JWT_DECODE_HANDLER':
-    'login.utils.jwt_decode_handler',
+    'libdrf.login.utils.jwt_decode_handler',
 
     'JWT_PAYLOAD_HANDLER':
-    'login.utils.jwt_payload_handler',
+    'libdrf.login.utils.jwt_payload_handler',
 
     'JWT_RESPONSE_PAYLOAD_HANDLER':
-    'login.utils.jwt_response_payload_handler',
+    'libdrf.login.utils.jwt_response_payload_handler',
 
     'JWT_SECRET_KEY': settings.SECRET_KEY,
     'JWT_ALGORITHM': 'HS256',
@@ -32,6 +32,10 @@ DEFAULTS = {
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
 
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
+
+    'SOCIAL_AUTH_GOOGLE_CLIENT_IDS': [],
+    'SOCIAL_AUTH_FACEBOOK_APP_ID': None,
+    'SOCIAL_AUTH_FACEBOOK_APP_SECRET': None,
 }
 
 # List of settings that may be in string import notation.

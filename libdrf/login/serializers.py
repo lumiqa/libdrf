@@ -3,12 +3,12 @@ import re
 from django.contrib.auth import authenticate
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework import exceptions, serializers
-from rest_framework_jwt.settings import api_settings
+from .settings import login_settings
 
 from . import models
 
-jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+jwt_payload_handler = login_settings.JWT_PAYLOAD_HANDLER
+jwt_encode_handler = login_settings.JWT_ENCODE_HANDLER
 
 
 class SocialTokenValidationSerializer(serializers.Serializer):

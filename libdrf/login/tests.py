@@ -6,11 +6,11 @@ from django.test import override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from rest_framework_jwt.settings import api_settings
+from .settings import login_settings
 
 from . import factories, models
 
-jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
+jwt_decode_handler = login_settings.JWT_DECODE_HANDLER
 
 
 class RegistrationTestCase(APITestCase):
