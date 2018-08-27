@@ -14,4 +14,9 @@ setup(
     url='https://github.com/lumiqa/libdrf',
     author='Adam Svanberg',
     author_email='adam@lumiqa.com',
+    install_requires=[
+        'djangorestframework>=3.8',
+        'requests>=2',
+        'PyJWT>=1.6.4',
+    ]
 )
