@@ -76,7 +76,7 @@ class RegistrationView(generics.GenericAPIView):
         url = login_settings.ACTIVATION_LINK_BUILDER(user, token)
 
         html_message = render_to_string(
-            'login/email-activation-inline.html',
+            'login/email-activation.html',
             {'url': url, 'email': login_settings.EMAIL_FROM}
         )
         text_message = render_to_string(
@@ -187,7 +187,7 @@ class ResetPasswordView(generics.GenericAPIView):
         )
         url = self.request.build_absolute_uri(path)
         html_message = render_to_string(
-            'login/email-password-change-inline.html',
+            'login/email-password-change.html',
             {'url': url, 'email': login_settings.EMAIL_FROM}
         )
         text_message = render_to_string(

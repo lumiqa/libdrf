@@ -1,11 +1,13 @@
-{% extends "account/email.html" %}
-{% block message %}
-  <h1>Nästan klart!</h1>
-  <p>
-    <strong>Bekräfta din e-postadress</strong> för att aktivera ditt konto.
-  </p>
-{% endblock %}
-
-{% block link_text %}
-  Bekräfta E-postadress
-{% endblock %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <h1>Nästan klart!</h1>
+    <p>
+      <a href="{{url}}"> Bekräfta E-postadress för att aktivera ditt konto.</a>
+    </p>
+  </body>
+</html>
