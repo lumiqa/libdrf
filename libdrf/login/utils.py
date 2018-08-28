@@ -60,7 +60,7 @@ def jwt_decode_handler(token):
     secret_key = jwt_get_secret_key(unverified_payload)
     return jwt.decode(
         token,
-        login_settings.JWT_PUBLIC_KEY or secret_key,
+        secret_key,
         login_settings.JWT_VERIFY,
         options=options,
         leeway=login_settings.JWT_LEEWAY,
@@ -70,7 +70,15 @@ def jwt_decode_handler(token):
     )
 
 
-def jwt_response_payload_handler(token):
+def jwt_response_payload_handler(token, user=None, request=None):
     return {
         'token': token
     }
+
+
+def activation_link_builder(user, token):
+    return '{}/activate/{}/{}'.format(
+        login_settings.WEBSITE_BASE_URL,
+        user.id,
+        token
+    )

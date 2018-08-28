@@ -36,6 +36,13 @@ DEFAULTS = {
     'SOCIAL_AUTH_GOOGLE_CLIENT_IDS': [],
     'SOCIAL_AUTH_FACEBOOK_APP_ID': None,
     'SOCIAL_AUTH_FACEBOOK_APP_SECRET': None,
+
+    'USER_ACTIVATION': True,
+    'EMAIL_FROM': '',
+    'WEBSITE_BASE_URL': '',
+    'ACTIVATION_LINK_BUILDER':
+    'libdrf.login.utils.activation_link_builder',
+
 }
 
 # List of settings that may be in string import notation.
@@ -44,6 +51,7 @@ IMPORT_STRINGS = (
     'JWT_DECODE_HANDLER',
     'JWT_PAYLOAD_HANDLER',
     'JWT_RESPONSE_PAYLOAD_HANDLER',
+    'ACTIVATION_LINK_BUILDER',
 )
 
 login_settings = APISettings(USER_SETTINGS, DEFAULTS, IMPORT_STRINGS)

@@ -1,0 +1,6 @@
+Nästan klart!
+
+Besök länken nedan för att bekräfta din e-postadress och aktivera ditt konto:
+
+{{url}}
+

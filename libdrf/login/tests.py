@@ -83,7 +83,8 @@ class RegistrationTestCase(APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         payload = {'old_password': 'supersecret', 'password': 'newpass'}
         resp = self.client.post(reverse('change-password'), payload)
-        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(resp.json()['token']) > 0)
 
     @override_settings(USER_ACTIVATION=False)
     def test_email_case_sensitivity(self):
@@ -97,7 +98,7 @@ class RegistrationTestCase(APITestCase):
         self.assertEqual(models.User.objects.get().email, 'test@example.com')
 
     @mock.patch.multiple(
-        'login.authentication.GoogleOauth2TokenAuthentication',
+        'libdrf.login.authentication.GoogleOauth2TokenAuthentication',
         validate_token=mock.DEFAULT,
         fetch_email=mock.DEFAULT
     )

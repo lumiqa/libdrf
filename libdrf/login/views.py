@@ -1,6 +1,5 @@
 import logging
 
-from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
@@ -12,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
 from . import authentication, models, serializers, utils
+from .settings import login_settings
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +59,7 @@ class RegistrationView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        verified = False if settings.USER_ACTIVATION else True
+        verified = False if login_settings.USER_ACTIVATION else True
 
         user = models.User.objects.create_user(
             email=serializer.validated_data['email'],
@@ -72,26 +72,23 @@ class RegistrationView(generics.GenericAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def send_activation_email(self, user):
-        url = '{}/activate/{}/{}'.format(
-            settings.WEBSITE_BASE_URL,
-            user.id,
-            default_token_generator.make_token(user)
-        )
+        token = default_token_generator.make_token(user)
+        url = login_settings.ACTIVATION_LINK_BUILDER(user, token)
 
         html_message = render_to_string(
             'login/email-activation-inline.html',
-            {'url': url, 'email': settings.DEFAULT_FROM_EMAIL}
+            {'url': url, 'email': login_settings.EMAIL_FROM}
         )
         text_message = render_to_string(
             'login/email-activation.txt',
-            {'url': url, 'email': settings.DEFAULT_FROM_EMAIL}
+            {'url': url, 'email': login_settings.EMAIL_FROM}
         )
         logger.info('Sending activation email to user {}'.format(user.pk))
         send_mail(
             subject=_('confirm_email_subject'),
             message=text_message,
             html_message=html_message,
-            from_email=settings.DEFAULT_FROM_EMAIL_NAME,
+            from_email=login_settings.EMAIL_FROM,
             recipient_list=[user.email],
         )
 
@@ -191,18 +188,18 @@ class ResetPasswordView(generics.GenericAPIView):
         url = self.request.build_absolute_uri(path)
         html_message = render_to_string(
             'login/email-password-change-inline.html',
-            {'url': url, 'email': settings.DEFAULT_FROM_EMAIL}
+            {'url': url, 'email': login_settings.EMAIL_FROM}
         )
         text_message = render_to_string(
             'login/email-password-change.txt',
-            {'url': url, 'email': settings.DEFAULT_FROM_EMAIL}
+            {'url': url, 'email': login_settings.EMAIL_FROM}
         )
         logger.info('Reset link for {}: {}'.format(user, url))
         send_mail(
             subject="Återställning av lösenord",
             message=text_message,
             html_message=html_message,
-            from_email=settings.DEFAULT_FROM_EMAIL_NAME,
+            from_email=login_settings.EMAIL_FROM,
             recipient_list=[user.email],
         )
 
