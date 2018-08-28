@@ -18,5 +18,7 @@ setup(
         'djangorestframework>=3.8',
         'requests>=2',
         'PyJWT>=1.6.4',
+        'django-rq>=0.9.5',
+        'croniter>=0.3.17',
     ]
 )
