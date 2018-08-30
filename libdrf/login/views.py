@@ -147,13 +147,10 @@ class ActivationView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.user
         user.verify()
-        if 'login' in self.request.query_params:
-            payload = utils.jwt_payload_handler(user)
-            jwt = utils.jwt_encode_handler(payload)
-            response_data = utils.jwt_response_payload_handler(jwt)
-            return Response(response_data)
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        payload = utils.jwt_payload_handler(user)
+        jwt = utils.jwt_encode_handler(payload)
+        response_data = utils.jwt_response_payload_handler(jwt)
+        return Response(response_data)
 
 
 class ResetPasswordView(generics.GenericAPIView):

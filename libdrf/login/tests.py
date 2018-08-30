@@ -44,7 +44,8 @@ class RegistrationTestCase(APITestCase):
             'token': token,
         }
         resp = self.client.post(reverse('activate'), val_payload)
-        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(resp.json()['token']) > 0)
 
         # Check that user is active
         u.refresh_from_db()
