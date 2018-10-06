@@ -234,7 +234,6 @@ class LoginView(generics.GenericAPIView):
         serializer = self.get_serializer(
             data=request.data
         )
-
         if serializer.is_valid():
             user = serializer.validated_data.get('user') or request.user
             token = serializer.validated_data.get('token')

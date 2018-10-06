@@ -1,16 +1,102 @@
 import logging
 
+import jwt
 import requests
+from django.utils.encoding import smart_text
 from rest_framework import exceptions
-from rest_framework.authentication import BaseAuthentication
-from .settings import login_settings
+from rest_framework.authentication import (BaseAuthentication,
+                                           get_authorization_header)
 
 from . import models
+from .settings import login_settings
 
 logger = logging.getLogger(__name__)
 
 jwt_payload_handler = login_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = login_settings.JWT_ENCODE_HANDLER
+
+jwt_decode_handler = login_settings.JWT_DECODE_HANDLER
+
+
+class JWTAuthentication(BaseAuthentication):
+    """
+    Token based authentication using the JSON Web Token standard.
+
+    Clients should authenticate by passing the token key in the "Authorization"
+    HTTP header, prepended with the string specified in the setting
+    `JWT_AUTH_HEADER_PREFIX`. For example:
+
+        Authorization: JWT eyJhbGciOiAiSFMyNTYiLCAidHlwIj
+    """
+    www_authenticate_realm = 'api'
+
+    def authenticate(self, request):
+        """
+        Returns a two-tuple of `User` and token if a valid signature has been
+        supplied using JWT-based authentication.  Otherwise returns `None`.
+        """
+        jwt_value = self.get_jwt_value(request)
+        if jwt_value is None:
+            return None
+
+        try:
+            payload = jwt_decode_handler(jwt_value)
+        except jwt.ExpiredSignature:
+            raise exceptions.AuthenticationFailed('Signature has expired.')
+        except jwt.DecodeError:
+            raise exceptions.AuthenticationFailed('Error decoding signature.')
+        except jwt.InvalidTokenError:
+            raise exceptions.AuthenticationFailed()
+
+        user = self.authenticate_credentials(payload)
+
+        return (user, jwt_value)
+
+    def authenticate_credentials(self, payload):
+        """
+        Returns an active user that matches the payload's user id and email.
+        """
+        user_id = payload.get('user_id')
+
+        if not user_id:
+            raise exceptions.AuthenticationFailed('Invalid payload.')
+
+        try:
+            user = models.User.objects.get(pk=user_id)
+        except models.User.DoesNotExist:
+            raise exceptions.AuthenticationFailed('Invalid signature.')
+
+        if not user.is_active:
+            raise exceptions.AuthenticationFailed('User account is disabled.')
+
+        return user
+
+    def get_jwt_value(self, request):
+        auth = get_authorization_header(request).split()
+
+        if not auth:
+            return None
+
+        try:
+            prefix, value = auth
+        except ValueError:
+            raise exceptions.AuthenticationFailed('Invalid Authorization header.')
+
+        if smart_text(prefix.lower()) != login_settings.JWT_AUTH_HEADER_PREFIX.lower():
+            return None
+
+        if len(auth) != 2:
+            raise exceptions.AuthenticationFailed('Invalid Authorization header.')
+
+        return auth[1]
+
+    def authenticate_header(self, request):
+        """
+        Return a string to be used as the value of the `WWW-Authenticate`
+        header in a `401 Unauthenticated` response, or `None` if the
+        authentication scheme should return `403 Permission Denied` responses.
+        """
+        return '{0} realm="{1}"'.format(login_settings.JWT_AUTH_HEADER_PREFIX, self.www_authenticate_realm)
 
 
 class BaseSocialTokenAuthentication(BaseAuthentication):
