@@ -44,8 +44,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         cron_settings = getattr(settings, 'LIBDRF_CRON', {})
-        default_queue = getattr(cron_settings, 'default_queue', 'cron')
-        job_specs = getattr(cron_settings, 'jobs', [])
+        default_queue = cron_settings.get('default_queue', 'cron')
+        job_specs = cron_settings.get('jobs', [])
 
         if not job_specs:
             logger.warning("No jobs in LIBDRF_CRON['jobs']")
