@@ -3,9 +3,9 @@ import time
 
 import django_rq
 from croniter import croniter
+from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
-from django.conf import settings
 from django.utils import timezone
 
 logger = logging.getLogger(__name__)
@@ -43,11 +43,11 @@ class Command(BaseCommand):
     help = "Start scheduling cron jobs to RQ"
 
     def handle(self, *args, **options):
-        cron_settings  = getattr(settings, 'LIBDRF_CRON', {})
-        default_queue  = getattr(cron_settings, 'DEFAULT_QUEUE', 'cron')
-        job_specs      = getattr(cron_settings, 'JOBS', [])
+        cron_settings = getattr(settings, 'LIBDRF_CRON', {})
+        default_queue = getattr(cron_settings, 'default_queue', 'cron')
+        job_specs = getattr(cron_settings, 'jobs', [])
 
-        if not job_spec:
+        if not job_specs:
             logger.warning("No jobs in LIBDRF_CRON['jobs']")
             return
 
