@@ -14,6 +14,7 @@ urlpatterns = [
     path(r'register/resend', views.ResendActivationView.as_view(), name='resend-activation'),
     path(r'activate', views.ActivationView.as_view(), name='activate'),
     path(r'password/reset', views.ResetPasswordView.as_view(), name='reset-password'),
+    path(r'password/link', views.ChangePasswordLinkView.as_view(), name='change-password-link'),
     path(r'password', views.ChangePasswordView.as_view(), name='change-password'),
 
     # Social token exchange

@@ -201,21 +201,34 @@ class ResetPasswordView(generics.GenericAPIView):
         )
 
 
-class ChangePasswordView(generics.GenericAPIView):
+class ChangePasswordLinkView(generics.GenericAPIView):
     """
-    Change password using email token if not authenticated
+    Change password using email token
     """
     permission_classes = [permissions.AllowAny]
+    serializer_class = serializers.ChangePasswordLinkSerializer
 
-    def post(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            serializer = serializers.ChangePasswordAuthenticatedSerializer(
-                data=request.data,
-                context={'request': self.request}
-            )
+    def put(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=self.request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.user.set_password(serializer.validated_data['password'])
+        serializer.user.save()
 
-        else:
-            serializer = serializers.ChangePasswordLinkSerializer(data=request.data)
+        payload = utils.jwt_payload_handler(serializer.user)
+        jwt = utils.jwt_encode_handler(payload)
+        response_data = utils.jwt_response_payload_handler(jwt)
+        return Response(response_data)
+
+
+class ChangePasswordView(generics.GenericAPIView):
+    """
+    Change password while logged in
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = serializers.ChangePasswordAuthenticatedSerializer
+
+    def put(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
         serializer.user.set_password(serializer.validated_data['password'])
         serializer.user.save()
@@ -249,6 +262,7 @@ class LoginView(generics.GenericAPIView):
 
 class LogoutView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = serializers.EmptySerializer
 
     def post(self, *args, **kwargs):
         # TODO: Perform token blacklisting or whatever here..
