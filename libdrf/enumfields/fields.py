@@ -4,16 +4,6 @@ from django.db import models
 
 class EnumFieldMixin:
 
-    def __init__(self, enum, **kwargs):
-        self.enum = enum
-        kwargs.setdefault("max_length", 10)
-        kwargs.setdefault(
-            "choices",
-            [(i.name, getattr(i, 'label', i.name)) for i in self.enum]
-        )
-        super().__init__(**kwargs)
-        self.validators = []
-
     def to_python(self, value):
         if value is None or value == '':
             return None
@@ -40,6 +30,16 @@ class EnumFieldMixin:
 
 class EnumCharField(EnumFieldMixin, models.CharField):
 
+    def __init__(self, enum, **kwargs):
+        self.enum = enum
+        kwargs.setdefault("max_length", 10)
+        kwargs.setdefault(
+            "choices",
+            [(i.name, getattr(i, 'label', i.name)) for i in self.enum]
+        )
+        super().__init__(**kwargs)
+        self.validators = []
+
     def get_prep_value(self, value):
         if value is None:
             return None
@@ -63,6 +63,15 @@ class EnumCharField(EnumFieldMixin, models.CharField):
 
 
 class EnumIntegerField(EnumFieldMixin, models.IntegerField):
+
+    def __init__(self, enum, **kwargs):
+        self.enum = enum
+        kwargs.setdefault(
+            "choices",
+            [(i.name, getattr(i, 'label', i.name)) for i in self.enum]
+        )
+        super().__init__(**kwargs)
+        self.validators = []
 
     def get_prep_value(self, value):
         if value is None:
