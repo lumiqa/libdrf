@@ -80,4 +80,9 @@ class EnumIntegerField(EnumFieldMixin, models.IntegerField):
         if isinstance(value, self.enum):
             return value.value
 
+        try:
+            return int(value)
+        except ValueError:
+            return self.to_python(value).value
+
         return int(value)
