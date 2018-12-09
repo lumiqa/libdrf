@@ -31,13 +31,6 @@ class ActivationSerializer(serializers.Serializer):
         return value
 
     def validate(self, attrs):
-        # HOTFIX: remove get params from token. Remove this when app
-        # is updated.
-        match = re.match(r'[\w-]+', attrs['token'])
-        if not match:
-            raise serializers.ValidationError('Invalid validation token')
-
-        attrs['token'] = match.group(0)
         if not default_token_generator.check_token(self.user, attrs['token']):
             raise serializers.ValidationError('Invalid validation token')
         return attrs
@@ -116,8 +109,7 @@ class ChangePasswordAuthenticatedSerializer(serializers.Serializer):
     def validate(self, attrs):
         user = self.context['request'].user
         if user.has_usable_password() and not user.check_password(attrs['old_password']):
-            # Keep 'non_field_errors' for mobile apps
-            raise serializers.ValidationError({'old_password': 'Invalid old password' , 'non_field_errors': 'Invalid old password'})
+            raise serializers.ValidationError({'old_password': 'Invalid old password'})
         self.user = user
         return attrs
 
