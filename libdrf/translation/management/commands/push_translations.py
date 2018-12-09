@@ -7,10 +7,7 @@ from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
 from django.db.models import Max
 
-from account.enums import OrderSide, OrderStatus
-from account.models import Account, Order
-from market.models import Instrument, InstrumentGraph
-from market.utils import ClosingPriceGenerator, Nordnet
+from ... import models
 
 logger = logging.getLogger(__name__)
 
@@ -28,3 +25,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        for language in config.LANGUAGES:
+            for translation in models.Translation.objects.all():
+                pass
