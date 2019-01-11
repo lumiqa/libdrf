@@ -1,5 +1,4 @@
 import logging
-import time
 
 import django_rq
 from croniter import croniter
@@ -12,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 
 class Job:
-
     def __init__(self, cron, cmd, queue, *args, **kwargs):
         self.cron = cron
         self.cmd = cmd
@@ -23,12 +21,12 @@ class Job:
         self.next_run = next(self.time_iterator)
 
     def __str__(self):
-        return '{}({})'.format(
+        return "{}({})".format(
             self.cmd,
-            ', '.join(
-                [repr(arg) for arg in self.args] +
-                ['{}={!r}'.format(k, v) for k, v in self.kwargs.items()]
-            )
+            ", ".join(
+                [repr(arg) for arg in self.args]
+                + ["{}={!r}".format(k, v) for k, v in self.kwargs.items()]
+            ),
         )
 
     def should_run(self):
@@ -40,12 +38,26 @@ class Job:
 
 
 class Command(BaseCommand):
+    """"Schedule tasks periodically
+
+    Runs management commands on a schedule. Example config:
+
+    LIBDRF_CRON = {
+        "default_queue": "cron",
+        "jobs": [
+            {"cron": "0 * * * *", "cmd": "run_task", "args": ["arg1"], "kwargs": {"kwarg1": "foo"}},
+            ...
+        ]
+    }
+
+    """
+
     help = "Start scheduling cron jobs to RQ"
 
     def handle(self, *args, **options):
-        cron_settings = getattr(settings, 'LIBDRF_CRON', {})
-        default_queue = cron_settings.get('default_queue', 'cron')
-        job_specs = cron_settings.get('jobs', [])
+        cron_settings = getattr(settings, "LIBDRF_CRON", {})
+        default_queue = cron_settings.get("default_queue", "cron")
+        job_specs = cron_settings.get("jobs", [])
 
         if not job_specs:
             logger.warning("No jobs in LIBDRF_CRON['jobs']")
@@ -53,22 +65,21 @@ class Command(BaseCommand):
 
         jobs = [
             Job(
-                j['cron'],
-                j['cmd'],
-                j.get('queue', default_queue),
-                *j.get('args', []),
-                **j.get('kwargs', {})
+                j["cron"],
+                j["cmd"],
+                j.get("queue", default_queue),
+                *j.get("args", []),
+                **j.get("kwargs", {})
             )
             for j in job_specs
         ]
 
-        logger.info('Running with {} jobs:\n {}'.format(
-            len(jobs),
-            '\n'.join('\t{} -> {}'.format(job.cron, job) for job in jobs)
-        ))
-        while True:
-            for job in jobs:
-                if job.should_run():
-                    logger.info('Scheduling job: {}'.format(job))
-                    job.enqueue()
-            time.sleep(30)
+        logger.info(
+            "Running with {} jobs:\n {}".format(
+                len(jobs), "\n".join("\t{} -> {}".format(job.cron, job) for job in jobs)
+            )
+        )
+        for job in jobs:
+            if job.should_run():
+                logger.info("Scheduling job: {}".format(job))
+                job.enqueue()
