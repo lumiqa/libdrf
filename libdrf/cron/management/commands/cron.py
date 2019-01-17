@@ -54,6 +54,12 @@ class Command(BaseCommand):
 
     help = "Start scheduling cron jobs to RQ"
 
+    def run(self, jobs):
+        for job in jobs:
+            if job.should_run():
+                logger.info("Scheduling job: {}".format(job))
+                job.enqueue()
+
     def handle(self, *args, **options):
         cron_settings = getattr(settings, "LIBDRF_CRON", {})
         default_queue = cron_settings.get("default_queue", "cron")
@@ -79,7 +85,5 @@ class Command(BaseCommand):
                 len(jobs), "\n".join("\t{} -> {}".format(job.cron, job) for job in jobs)
             )
         )
-        for job in jobs:
-            if job.should_run():
-                logger.info("Scheduling job: {}".format(job))
-                job.enqueue()
+        while True:
+            self.run(jobs)
