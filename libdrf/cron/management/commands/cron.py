@@ -1,4 +1,5 @@
 import logging
+from time import sleep
 
 import django_rq
 from croniter import croniter
@@ -54,8 +55,9 @@ class Command(BaseCommand):
 
     help = "Start scheduling cron jobs to RQ"
 
-    def run(self, jobs):
-        for job in jobs:
+    def run(self):
+        logger.info("Checking {} cron jobs".format(len(self.jobs)))
+        for job in self.jobs:
             if job.should_run():
                 logger.info("Scheduling job: {}".format(job))
                 job.enqueue()
@@ -69,7 +71,7 @@ class Command(BaseCommand):
             logger.warning("No jobs in LIBDRF_CRON['jobs']")
             return
 
-        jobs = [
+        self.jobs = [
             Job(
                 j["cron"],
                 j["cmd"],
@@ -82,8 +84,10 @@ class Command(BaseCommand):
 
         logger.info(
             "Running with {} jobs:\n {}".format(
-                len(jobs), "\n".join("\t{} -> {}".format(job.cron, job) for job in jobs)
+                len(self.jobs),
+                "\n".join("\t{} -> {}".format(job.cron, job) for job in self.jobs),
             )
         )
         while True:
-            self.run(jobs)
+            self.run()
+            sleep(60)
