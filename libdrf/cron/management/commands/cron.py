@@ -35,7 +35,12 @@ class Job:
 
     def enqueue(self):
         self.queue.enqueue(call_command, self.cmd, *self.args, **self.kwargs)
-        self.next_run = next(self.time_iterator)
+        for next_run in next(self.time_iterator):
+            if next_run > timezone.now():
+                logger.info("Next run for {} at {}".format(self, next_run))
+                self.next_run = next_run
+                break
+            logger.info("Skipping next run in the past: {}".format(next_run))
 
 
 class Command(BaseCommand):
