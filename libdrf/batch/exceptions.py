@@ -1,0 +1,2 @@
+class BadBatchRequest(Exception):
+    pass

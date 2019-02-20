@@ -1,9 +1,10 @@
 import json
 import logging
 
-from django.core.urlresolvers import resolve
 from django.db import transaction
-from django.http.response import HttpResponseServerError
+from django.http.response import HttpResponseNotFound, HttpResponseServerError
+from django.urls import resolve
+from django.urls.exceptions import Resolver404
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 
@@ -17,18 +18,21 @@ logger = logging.getLogger(__name__)
 
 def get_deserialized_response(wsgi_request):
     # Get the view / handler for this request
-    view, args, kwargs = resolve(wsgi_request.path_info)
-
-    kwargs.update({"request": wsgi_request})
-
-    # Let the view do his task.
     try:
-        with transaction.atomic():
-            resp = view(*args, **kwargs)
-    except Exception as exc:
-        resp = HttpResponseServerError(
-            content="{}: {}".format(exc.__class__.__name__, exc)
-        )
+        view, args, kwargs = resolve(wsgi_request.path_info)
+    except Resolver404 as exc:
+        resp = HttpResponseNotFound()
+
+    else:
+        kwargs.update({"request": wsgi_request})
+
+        # Let the view do his task.
+        try:
+            with transaction.atomic():
+                resp = view(*args, **kwargs)
+        except Exception as exc:
+            logger.exception("Batch request server error")
+            resp = HttpResponseServerError()
 
     headers = dict(resp._headers.values())
 
@@ -54,12 +58,11 @@ class BatchRequestView(generics.GenericAPIView):
 
     def post(self, *args, **kwargs):
 
-        serializer = BatchRequestSerializer(data=self.request.data, many=True)
+        serializer = BatchRequestSerializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
-        urls = [
-            "{} {}".format(req["method"].upper(), req["url"])
-            for req in serializer.validated_data
-        ]
+        specs = serializer.validated_data["requests"]
+
+        urls = ["{} {}".format(req["method"].upper(), req["url"]) for req in specs]
         logger.info("Batch requests:\n    {}".format("\n    ".join(urls)))
         requests = [
             get_wsgi_request_object(
@@ -69,7 +72,7 @@ class BatchRequestView(generics.GenericAPIView):
                 req.get("headers", {}),
                 json.dumps(req["body"]) if "body" in req else None,
             )
-            for req in serializer.validated_data
+            for req in specs
         ]
 
         num_requests = len(requests)

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 
-class BatchRequestSerializer(serializers.Serializer):
+class BatchRequestItemSerializer(serializers.Serializer):
     url = serializers.CharField()
     method = serializers.ChoiceField(
         choices=[
@@ -22,6 +22,10 @@ class BatchRequestSerializer(serializers.Serializer):
 
     def validate_method(self, method):
         return method.lower()
+
+
+class BatchRequestSerializer(serializers.Serializer):
+    requests = BatchRequestItemSerializer(many=True)
 
 
 class BatchResponseSerializer(serializers.Serializer):

@@ -4,11 +4,11 @@ from importlib import import_module
 from django.conf import settings
 
 DEFAULTS = {
-    "HEADERS_TO_INCLUDE": ["HTTP_USER_AGENT", "HTTP_COOKIE"],
+    "PASS_HEADERS": ["HTTP_USER_AGENT", "HTTP_COOKIE"],
     "DEFAULT_CONTENT_TYPE": "application/json",
     "USE_HTTPS": False,
     "EXECUTE_PARALLEL": False,
-    "CONCURRENT_EXECUTOR": "libdrf.batch.concurrent.executor.ThreadBasedExecutor",
+    "CONCURRENT_EXECUTOR": "libdrf.batch.executors.ThreadBasedExecutor",
     "NUM_WORKERS": multiprocessing.cpu_count() * 4,
     "ADD_DURATION_HEADER": True,
     "DURATION_HEADER_NAME": "libdrf.batch.duration",
@@ -45,7 +45,7 @@ class BatchSettings(object):
             Creating an ExecutorPool is a costly operation. Executor needs to be instantiated only once.
         """
         if self.EXECUTE_PARALLEL is False:
-            executor_path = "batch_requests.concurrent.executor.SequentialExecutor"
+            executor_path = "libdrf.batch.executors.SequentialExecutor"
             executor_class = import_class(executor_path)
             return executor_class()
         else:

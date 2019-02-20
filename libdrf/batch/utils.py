@@ -82,9 +82,7 @@ def headers_to_include_from_request(curr_request):
         Define headers that needs to be included from the current request.
     """
     return {
-        h: v
-        for h, v in curr_request.META.items()
-        if h in batch_settings.HEADERS_TO_INCLUDE
+        h: v for h, v in curr_request.META.items() if h in batch_settings.PASS_HEADERS
     }
 
 
@@ -94,9 +92,7 @@ def get_wsgi_request_object(curr_request, method, url, headers, body):
     """
     x_headers = headers_to_include_from_request(curr_request)
     method, t_headers = pre_process_method_headers(method, headers)
-    import pdb
 
-    pdb.set_trace()
     # Add default content type.
     if "CONTENT_TYPE" not in t_headers:
         t_headers.update({"CONTENT_TYPE": batch_settings.DEFAULT_CONTENT_TYPE})
