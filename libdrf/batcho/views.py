@@ -9,7 +9,7 @@ from rest_framework.response import Response
 
 from .exceptions import BadBatchRequest
 from .serializers import BatchRequestSerializer, BatchResponseSerializer
-from .settings import br_settings
+from .settings import batch_settings
 from .utils import get_wsgi_request_object
 
 logger = logging.getLogger(__name__)
@@ -73,10 +73,10 @@ class BatchRequestView(generics.GenericAPIView):
         ]
 
         num_requests = len(requests)
-        if num_requests > br_settings.MAX_LIMIT:
+        if num_requests > batch_settings.MAX_LIMIT:
             raise BadBatchRequest(
-                "You can batch maximum of {} requests.".format(br_settings.MAX_LIMIT)
+                "You can batch maximum of {} requests.".format(batch_settings.MAX_LIMIT)
             )
-        responses = br_settings.executor.execute(requests, get_deserialized_response)
+        responses = batch_settings.executor.execute(requests, get_deserialized_response)
         serializer = BatchResponseSerializer(responses, many=True)
         return Response(serializer.data)

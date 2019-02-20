@@ -8,15 +8,15 @@ DEFAULTS = {
     "DEFAULT_CONTENT_TYPE": "application/json",
     "USE_HTTPS": False,
     "EXECUTE_PARALLEL": False,
-    "CONCURRENT_EXECUTOR": "batch_requests.concurrent.executor.ThreadBasedExecutor",
+    "CONCURRENT_EXECUTOR": "libdrf.batch.concurrent.executor.ThreadBasedExecutor",
     "NUM_WORKERS": multiprocessing.cpu_count() * 4,
     "ADD_DURATION_HEADER": True,
-    "DURATION_HEADER_NAME": "batch_requests.duration",
+    "DURATION_HEADER_NAME": "libdrf.batch.duration",
     "MAX_LIMIT": 20,
 }
 
 
-USER_DEFINED_SETTINGS = getattr(settings, "BATCH_REQUESTS", {})
+USER_DEFINED_SETTINGS = getattr(settings, "LIBDRF_BATCH", {})
 
 
 def import_class(class_path):
@@ -25,11 +25,11 @@ def import_class(class_path):
     """
     module_name, class_name = class_path.rsplit(".", 1)
     module = import_module(module_name)
-    claz = getattr(module, class_name)
-    return claz
+    cls = getattr(module, class_name)
+    return cls
 
 
-class BatchRequestSettings(object):
+class BatchSettings(object):
 
     """
         Allow API settings to be accessed as properties.
@@ -73,4 +73,4 @@ class BatchRequestSettings(object):
         return val
 
 
-br_settings = BatchRequestSettings(USER_DEFINED_SETTINGS, DEFAULTS)
+batch_settings = BatchSettings(USER_DEFINED_SETTINGS, DEFAULTS)

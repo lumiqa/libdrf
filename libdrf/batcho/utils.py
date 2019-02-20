@@ -1,6 +1,6 @@
 from django.test.client import FakePayload, RequestFactory
 
-from batch_requests.settings import br_settings as _settings
+from .settings import batch_settings
 
 
 class BatchRequestFactory(RequestFactory):
@@ -82,7 +82,9 @@ def headers_to_include_from_request(curr_request):
         Define headers that needs to be included from the current request.
     """
     return {
-        h: v for h, v in curr_request.META.items() if h in _settings.HEADERS_TO_INCLUDE
+        h: v
+        for h, v in curr_request.META.items()
+        if h in batch_settings.HEADERS_TO_INCLUDE
     }
 
 
@@ -97,18 +99,18 @@ def get_wsgi_request_object(curr_request, method, url, headers, body):
     pdb.set_trace()
     # Add default content type.
     if "CONTENT_TYPE" not in t_headers:
-        t_headers.update({"CONTENT_TYPE": _settings.DEFAULT_CONTENT_TYPE})
+        t_headers.update({"CONTENT_TYPE": batch_settings.DEFAULT_CONTENT_TYPE})
 
     # Override existing batch requests headers with the new headers passed for this request.
     x_headers.update(t_headers)
 
-    content_type = x_headers.get("CONTENT_TYPE", _settings.DEFAULT_CONTENT_TYPE)
+    content_type = x_headers.get("CONTENT_TYPE", batch_settings.DEFAULT_CONTENT_TYPE)
 
     # Get hold of request factory to construct the request.
     _request_factory = BatchRequestFactory()
     _request_provider = getattr(_request_factory, method)
 
-    secure = _settings.USE_HTTPS
+    secure = batch_settings.USE_HTTPS
 
     request = _request_provider(
         url, data=body, secure=secure, content_type=content_type, **x_headers
