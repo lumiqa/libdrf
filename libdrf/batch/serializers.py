@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 
 class BatchRequestItemSerializer(serializers.Serializer):
-    url = serializers.CharField()
+    path = serializers.CharField()
     method = serializers.ChoiceField(
         choices=[
             ("get", "get"),
@@ -28,8 +28,12 @@ class BatchRequestSerializer(serializers.Serializer):
     requests = BatchRequestItemSerializer(many=True)
 
 
-class BatchResponseSerializer(serializers.Serializer):
+class BatchResponseItemSerializer(serializers.Serializer):
     status_code = serializers.IntegerField()
     reason_phrase = serializers.CharField()
     body = serializers.JSONField()
     headers = serializers.DictField(required=False)
+
+
+class BatchResponseSerializer(serializers.Serializer):
+    responses = BatchResponseItemSerializer(many=True)

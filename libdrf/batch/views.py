@@ -62,13 +62,13 @@ class BatchRequestView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         specs = serializer.validated_data["requests"]
 
-        urls = ["{} {}".format(req["method"].upper(), req["url"]) for req in specs]
-        logger.info("Batch requests:\n    {}".format("\n    ".join(urls)))
+        paths = ["{} {}".format(req["method"].upper(), req["path"]) for req in specs]
+        logger.info("Batch requests:\n    {}".format("\n    ".join(paths)))
         requests = [
             get_wsgi_request_object(
                 self.request,
                 req["method"],
-                req["url"],
+                req["path"],
                 req.get("headers", {}),
                 json.dumps(req["body"]) if "body" in req else None,
             )
@@ -81,5 +81,5 @@ class BatchRequestView(generics.GenericAPIView):
                 "You can batch maximum of {} requests.".format(batch_settings.MAX_LIMIT)
             )
         responses = batch_settings.executor.execute(requests, get_deserialized_response)
-        serializer = BatchResponseSerializer(responses, many=True)
+        serializer = BatchResponseSerializer({"responses": responses})
         return Response(serializer.data)

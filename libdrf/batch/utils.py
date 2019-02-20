@@ -86,7 +86,7 @@ def headers_to_include_from_request(curr_request):
     }
 
 
-def get_wsgi_request_object(curr_request, method, url, headers, body):
+def get_wsgi_request_object(curr_request, method, path, headers, body):
     """
         Based on the given request parameters, constructs and returns the WSGI request object.
     """
@@ -107,9 +107,8 @@ def get_wsgi_request_object(curr_request, method, url, headers, body):
     _request_provider = getattr(_request_factory, method)
 
     secure = batch_settings.USE_HTTPS
-
     request = _request_provider(
-        url, data=body, secure=secure, content_type=content_type, **x_headers
+        path, data=body, secure=secure, content_type=content_type, **x_headers
     )
 
     return request
