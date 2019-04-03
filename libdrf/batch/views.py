@@ -70,7 +70,7 @@ class BatchRequestView(generics.GenericAPIView):
                 req["method"],
                 req["path"],
                 req.get("headers", {}),
-                json.dumps(req["body"]) if "body" in req else None,
+                json.dumps(req["body"]) if req.get("body") else None,
             )
             for req in specs
         ]
