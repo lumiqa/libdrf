@@ -265,7 +265,7 @@ class LogoutView(generics.GenericAPIView):
     serializer_class = serializers.EmptySerializer
 
     def post(self, *args, **kwargs):
-        # TODO: Perform token blacklisting or whatever here..
+        self.request.user.invalidate_tokens()
         return Response(status=status.HTTP_200_OK)
 
 

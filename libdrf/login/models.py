@@ -57,3 +57,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.set_password(pw)
         self.password_reset = timezone.now()
         self.save()
+
+    def invalidate_tokens(self):
+        self.password_reset = timezone.now()
+        self.save()
