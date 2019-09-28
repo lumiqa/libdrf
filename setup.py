@@ -7,7 +7,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 setup(
     name='libdrf',
     version='0.1',
-    packages=find_packages(),
+    packages=['libdrf'],
     include_package_data=True,
     license='MIT License',
     description='Reusable apps and utilities for Django Rest Framework projects',
