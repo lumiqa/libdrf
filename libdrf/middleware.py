@@ -23,7 +23,11 @@ class LogSQLMiddleware:
             response = self.get_response(request)
         logger.info(
             "SQL Queries for request {}:\n{}".format(
-                request.path, pformat(connection.queries)
+                request.path,
+                "\n".join(
+                    "    [{}]: {}".format(q["time"], q["sql"])
+                    for q in connection.queries
+                ),
             )
         )
         logger.info(
