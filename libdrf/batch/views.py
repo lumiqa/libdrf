@@ -42,13 +42,17 @@ def get_deserialized_response(wsgi_request):
         "reason_phrase": resp.reason_phrase,
         "headers": headers,
     }
-    if not resp.content:
-        body = None
-    elif hasattr(resp, "render"):
+    if hasattr(resp, "render"):
         resp.render()
-        body = json.loads(resp.content)
+        if not resp.content:
+            body = None
+        else:
+            body = json.loads(resp.content)
     else:
-        body = str(resp.content, "utf8")
+        if not resp.content:
+            body = None
+        else:
+            body = str(resp.content, "utf8")
     d_resp.update({"body": body})
 
     return d_resp
