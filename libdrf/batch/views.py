@@ -42,8 +42,9 @@ def get_deserialized_response(wsgi_request):
         "reason_phrase": resp.reason_phrase,
         "headers": headers,
     }
-
-    if hasattr(resp, "render"):
+    if not resp.content:
+        body = None
+    elif hasattr(resp, "render"):
         resp.render()
         body = json.loads(resp.content)
     else:
