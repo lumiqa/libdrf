@@ -34,7 +34,7 @@ def get_deserialized_response(wsgi_request):
             logger.exception("Batch request server error")
             resp = HttpResponseServerError()
 
-    headers = dict(resp._headers.values())
+    headers = resp.headers.copy()
 
     # Convert HTTP response into simple dict type.
     d_resp = {
