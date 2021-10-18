@@ -41,6 +41,7 @@ def get_deserialized_response(wsgi_request):
         "status_code": resp.status_code,
         "reason_phrase": resp.reason_phrase,
         "headers": headers,
+        "path": wsgi_request.get_full_path(),
     }
     if hasattr(resp, "render"):
         resp.render()
