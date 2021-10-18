@@ -33,6 +33,7 @@ class BatchResponseItemSerializer(serializers.Serializer):
     reason_phrase = serializers.CharField()
     body = serializers.JSONField()
     headers = serializers.DictField(required=False)
+    path = serializers.CharField(required=False)
 
 
 class BatchResponseSerializer(serializers.Serializer):
