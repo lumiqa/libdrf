@@ -2,7 +2,7 @@ import logging
 
 import jwt
 import requests
-from django.utils.encoding import smart_text
+from django.utils.encoding import force_str
 from rest_framework import exceptions
 from rest_framework.authentication import (BaseAuthentication,
                                            get_authorization_header)
@@ -82,7 +82,7 @@ class JWTAuthentication(BaseAuthentication):
         except ValueError:
             raise exceptions.AuthenticationFailed('Invalid Authorization header.')
 
-        if smart_text(prefix.lower()) != login_settings.JWT_AUTH_HEADER_PREFIX.lower():
+        if force_str(prefix.lower()) != login_settings.JWT_AUTH_HEADER_PREFIX.lower():
             return None
 
         if len(auth) != 2:
