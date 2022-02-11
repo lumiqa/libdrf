@@ -17,7 +17,7 @@ setup(
     install_requires=[
         'djangorestframework>=3.8',
         'requests>=2',
-        'PyJWT~=2',
+        'PyJWT>=2',
         'django-rq>=0.9.5',
         'croniter>=0.3.17',
     ]
